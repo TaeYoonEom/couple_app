@@ -1,0 +1,14 @@
+# 가상환경
+backend/venv/
+__pycache__/
+
+# 노드 패키지
+frontend/node_modules/
+frontend/.next/
+
+# 환경 변수 및 OS 파일
+.env*
+.DS_Store
+
+# 가상환경 실행 코드 
+.\venv\Scripts\activate
