@@ -1,14 +1,18 @@
-# 가상환경
+# 가상환경 및 파이썬 캐시
 backend/venv/
-__pycache__/
+backend/__pycache__/
+*.pyc
 
-# 노드 패키지
+# 노드 패키지 및 빌드 결과물
 frontend/node_modules/
 frontend/.next/
+frontend/out/
 
-# 환경 변수 및 OS 파일
-.env*
+# 보안 및 환경 변수 (절대 업로드 금지)
+.env
+.env.local
+.env.*
+
+# OS 파일
 .DS_Store
-
-# 가상환경 실행 코드 
-.\venv\Scripts\activate
+Thumbs.db

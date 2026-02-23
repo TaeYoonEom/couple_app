@@ -1,43 +1,104 @@
-"use client"; // 브라우저에서 실행되는 코드임을 선언
+"use client";
 import { useEffect, useState } from "react";
 
+interface Schedule {
+  id?: number;
+  title: string;
+  date: string;
+  content: string;
+}
+
 export default function Home() {
-  const [message, setMessage] = useState("백엔드 연결 시도 중...");
+  const [schedules, setSchedules] = useState<Schedule[]>([]);
+  const [title, setTitle] = useState("");
+  const [date, setDate] = useState("");
+  const [content, setContent] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [issubmitting, setIsSubmitting] = useState(false); // 저장 중복 방지
+
+  const fetchSchedules = async () => {
+    try {
+      const res = await fetch("http://127.0.0.1:8000/schedules");
+      const data = await res.json();
+      setSchedules(data);
+    } catch (error) {
+      console.error("데이터 로드 실패:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    // 백엔드(FastAPI) 서버 주소로 요청을 보냅니다.
-    fetch("http://127.0.0.1:8000/")
-      .then((res) => {
-        if (!res.ok) throw new Error("네트워크 응답에 문제가 있습니다.");
-        return res.json();
-      })
-      .then((data) => {
-        setMessage(data.message); // 백엔드에서 받은 메시지로 변경
-      })
-      .catch((error) => {
-        console.error("에러 발생:", error);
-        setMessage("백엔드 서버가 켜져 있는지 확인해주세요!");
-      });
+    fetchSchedules();
   }, []);
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // trim()을 써서 공백만 입력된 경우도 걸러냅니다.
+    const cleanTitle = title.trim();
+    const cleanDate = date;
+
+    if (!cleanTitle || !cleanDate) {
+      return alert("제목과 날짜를 정확히 입력해주세요! ✍️");
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const res = await fetch("http://127.0.0.1:8000/schedules", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: cleanTitle, date: cleanDate, content: content }),
+      });
+
+      if (res.ok) {
+        alert("일정이 저장되었습니다! ❤️");
+        setTitle(""); setDate(""); setContent(""); 
+        await fetchSchedules(); 
+      }
+    } catch (error) {
+      alert("백엔드 서버와 연결할 수 없습니다. 서버가 켜져있나요?");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
-    <main style={{ 
-      display: "flex", 
-      flexDirection: "column", 
-      alignItems: "center", 
-      justifyContent: "center", 
-      height: "100vh",
-      fontFamily: "sans-serif"
-    }}>
-      <h1 style={{ color: "#ff4b5c" }}>❤️ 커플 일정 공유 앱</h1>
-      <div style={{ 
-        padding: "20px", 
-        borderRadius: "10px", 
-        backgroundColor: "#f0f0f0",
-        marginTop: "20px"
-      }}>
-        <p>백엔드 신호: <strong>{message}</strong></p>
-      </div>
+    <main style={{ padding: "20px", maxWidth: "600px", margin: "0 auto", fontFamily: "sans-serif" }}>
+      <h1 style={{ color: "#ff4b5c", textAlign: "center" }}>❤️ 우리들의 일정장</h1>
+
+      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "10px", padding: "20px", border: "1px solid #eee", borderRadius: "10px" }}>
+        <input type="text" placeholder="일정 제목" value={title} onChange={(e) => setTitle(e.target.value)} style={{ padding: "10px" }} />
+        <input type="date" value={date} onChange={(e) => setDate(e.target.value)} style={{ padding: "10px" }} />
+        <textarea placeholder="메모할 내용" value={content} onChange={(e) => setContent(e.target.value)} style={{ padding: "10px", height: "60px" }} />
+        <button 
+          type="submit" 
+          disabled={issubmitting}
+          style={{ 
+            padding: "10px", 
+            backgroundColor: issubmitting ? "#ccc" : "#ff4b5c", 
+            color: "white", border: "none", borderRadius: "5px", cursor: issubmitting ? "not-allowed" : "pointer" 
+          }}
+        >
+          {issubmitting ? "저장 중..." : "일정 저장하기"}
+        </button>
+      </form>
+
+      <hr style={{ margin: "30px 0", border: "0.5px solid #eee" }} />
+
+      <h2>🗓️ 다가오는 일정</h2>
+      {loading ? <p>불러오는 중...</p> : (
+        <ul style={{ listStyle: "none", padding: 0 }}>
+          {schedules.length === 0 && <p>등록된 일정이 없어요.</p>}
+          {schedules.map((s, index) => (
+            <li key={index} style={{ padding: "15px", borderBottom: "1px solid #f0f0f0" }}>
+              <strong>{s.date}</strong> - {s.title}
+              <p style={{ fontSize: "0.9rem", color: "#666" }}>{s.content}</p>
+            </li>
+          ))}
+        </ul>
+      )}
     </main>
   );
 }
