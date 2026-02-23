@@ -1,0 +1,6 @@
+name = "couple-app-backend"
+main = "main.py"
+compatibility_date = "2026-02-23"
+compatibility_flags = ["python_workers"]
+
+# [python_worker] 섹션을 지우고 이 플래그만 남기는 것이 2026년 표준입니다.
