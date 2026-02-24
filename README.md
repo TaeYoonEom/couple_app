@@ -11,6 +11,7 @@
 2. `npm run dev`
 
 ## 🛠 깃허브 업로드 명령어
-1. `git add .`
-2. `git commit -m "작업 내용"`
-3. `git push origin main`
+1. `git init`
+2. `git add .`
+3. `git commit -m "작업 내용"`
+4. `git push origin main`
