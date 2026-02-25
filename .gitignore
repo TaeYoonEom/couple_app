@@ -1,18 +1,24 @@
-# 가상환경 및 파이썬 캐시
+# [Python / Backend]
 backend/venv/
+backend/env/
 backend/__pycache__/
-*.pyc
+backend/*.py[cod]
 
-# 노드 패키지 및 빌드 결과물
+# [Node.js / Frontend]
 frontend/node_modules/
 frontend/.next/
 frontend/out/
+frontend/build/
+frontend/*.log*
 
-# 보안 및 환경 변수 (절대 업로드 금지)
+# [Security - 절대 업로드 금지]
+# 프로젝트 전체의 모든 .env 파일을 차단합니다.
 .env
 .env.local
-.env.*
+*.env
+*.env.*
 
-# OS 파일
+# [OS 및 도구]
 .DS_Store
 Thumbs.db
+.wrangler/
